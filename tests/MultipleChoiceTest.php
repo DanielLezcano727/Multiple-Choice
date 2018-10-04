@@ -1,12 +1,14 @@
 <?php
 
-namespace Multiple_Choice;
+namespace MultiChoice;
 
 use PHPUnit\Framework\TestCase;
 
 class MultipleChoiceTest extends TestCase{
+
     public function testPrimero(){
         $MultChoice = new MultipleChoice();
         $this->assertTrue(isset($MultChoice));
     }
+
 }

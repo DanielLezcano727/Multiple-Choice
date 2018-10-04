@@ -5,7 +5,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Multiple-Choice\\": "src"
+            "MultiChoice\\": "src"
         }
     }
 }
