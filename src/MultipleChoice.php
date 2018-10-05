@@ -39,7 +39,20 @@ class MultipleChoice{
         return $this->preguntas['preguntas'];
     }
 
+    public function devolverEnunciado($pregunta){
+        return $pregunta['descripcion'];
+    }
+
     public function devolverCantidad(){
         return $this->cantPreguntas;
+    }
+
+    public function devolverRespuestas($pregunta){
+        $aux = $pregunta['respuestas_incorrectas'];
+        $cant = count($pregunta['respuestas_correctas']);
+        for($i = 0; $i<$cant;$i++){
+            array_push($aux,$pregunta['respuestas_correctas'][$i]);
+        }
+        return $aux;
     }
 }

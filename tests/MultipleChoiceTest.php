@@ -56,4 +56,40 @@ class MultipleChoiceTest extends TestCase{
         $mult = new MultipleChoice();
         $this->assertEquals($preguntas,$mult->devolverPreguntas());        
     }
+
+    public function testEnunciado(){
+        $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
+        $mult = new MultipleChoice();
+        for($i = 0; $i < count($preguntas);$i++){
+            $this->assertEquals($preguntas[$i], $mult->devolverPreguntas()[$i]);
+        }
+    }
+
+    public function testRespuestas(){
+        $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
+        $mult = new MultipleChoice();
+        $respuestas = $preguntas[0]['respuestas_incorrectas'];
+        $cant = count($preguntas[0]['respuestas_correctas']);
+        for($i = 0; $i<$cant;$i++){
+            array_push($respuestas,$preguntas[0]['respuestas_correctas'][$i]);
+        }
+        $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas()[0]), $respuestas);
+
+
+        $respuestas = $preguntas[1]['respuestas_incorrectas'];
+        $cant = count($preguntas[1]['respuestas_correctas']);
+        for($i = 0; $i<$cant;$i++){
+            array_push($respuestas,$preguntas[1]['respuestas_correctas'][$i]);
+        }
+        $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas()[1]), $respuestas);
+        
+        
+        $respuestas = $preguntas[2]['respuestas_incorrectas'];
+        $cant = count($preguntas[2]['respuestas_correctas']);
+        for($i = 0; $i<$cant;$i++){
+            array_push($respuestas,$preguntas[2]['respuestas_correctas'][$i]);
+        }
+        $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas()[2]), $respuestas);
+        
+    }
 }
