@@ -22,6 +22,10 @@ class MultipleChoice{
 
     }
 
+    /**
+     * Mezcla las preguntas y elige las que van a ser utilizadas para el examen
+     * 
+     */
     public function organizar(){
         $this->preguntas = $this->mezclar($this->preguntas['preguntas'],$this->cantPreguntas);
         for($i=0;$i<$this->cantPreguntas;$i++){
@@ -30,7 +34,14 @@ class MultipleChoice{
         }
     }
 
-
+    /**
+     * Mezcla las preguntas y elimina las que sobren. Devuelve las preguntas restantes.
+     * 
+     * @param array $array
+     * @param int $cant
+     * 
+     * @return array
+     */
     public function mezclar($array, $cant){
         shuffle($array);
         for($i = count($array);$i>$cant;$i--){
@@ -40,18 +51,42 @@ class MultipleChoice{
         return $array;
     }
 
+    /**
+     * Devuelve un array que posee solo las preguntas con sus respuestas
+     * 
+     * @return array
+     */
     public function devolverPreguntas(){
         return $this->preguntas['preguntas'];
     }
 
+    /**
+     * Devuelve el enunciado de la consigna.
+     * 
+     * @param array $pregunta
+     * 
+     * @return string
+     */
     public function devolverEnunciado($pregunta){
         return $pregunta['descripcion'];
     }
 
+    /**
+     * Devuelve la cantidad de preguntas que decidio utilizar el usuario
+     * 
+     * @return int
+     */
     public function devolverCantidad(){
         return $this->cantPreguntas;
     }
 
+    /**
+     * Devuelve un array que posee las respuestas correctas e incorrectas
+     * 
+     * @param array $pregunta
+     * 
+     * @return array
+     */
     public function devolverRespuestas($pregunta){
         $aux = $pregunta['respuestas_incorrectas'];
         $cant = count($pregunta['respuestas_correctas']);
@@ -61,6 +96,11 @@ class MultipleChoice{
         return $aux;
     }
 
+    /**
+     * Recuerda las respuestas correctas e incorrectas y devuelve la pregunta con las respuestas modificadas
+     * 
+     * @return array
+     */
     public function inicializarRespuestas($pregunta){
         $cant = count($pregunta['respuestas_incorrectas']);
 
