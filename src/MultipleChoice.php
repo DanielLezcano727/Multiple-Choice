@@ -4,18 +4,18 @@ namespace MultiChoice;
 
 use Symfony\Component\Yaml\Yaml;
 
-class MultipleChoice{
+class MultipleChoice {
     protected $cantPreguntas;
     protected $preguntas;
     protected $preguntasElegidas;
     
-    public function __construct($cantPreguntas = 12){
+    public function __construct($cantPreguntas = 12) {
 
         $this->preguntas = Yaml::parseFile('Preguntas/preguntas.yml');
 
-        if($cantPreguntas < count($this->preguntas['preguntas']) && $cantPreguntas > 0){
+        if ($cantPreguntas < count($this->preguntas['preguntas']) && $cantPreguntas > 0) {
             $this->cantPreguntas = $cantPreguntas;
-        }else{
+        }else {
             $this->cantPreguntas = 12;
         }
 
@@ -27,13 +27,13 @@ class MultipleChoice{
      * Mezcla las preguntas y elige las que van a ser utilizadas para el examen
      * 
      */
-    public function organizar(){
+    public function organizar() {
 
-        $this->preguntas = $this->mezclar($this->preguntas['preguntas'],$this->cantPreguntas);
+        $this->preguntas = $this->mezclar($this->preguntas['preguntas'], $this->cantPreguntas);
         
         $this->preguntasElegidas = $this->preguntas;
         
-        for($i=0;$i<$this->cantPreguntas;$i++){
+        for ($i = 0;$i < $this->cantPreguntas;$i++) {
             $this->preguntas[$i] = $this->inicializarRespuestas($this->preguntas[$i]);
             $this->preguntas[$i] = $this->generarPregunta($this->preguntas[$i]);
         }
@@ -47,9 +47,9 @@ class MultipleChoice{
      * 
      * @return array
      */
-    public function mezclar($array, $cant){
+    public function mezclar($array, $cant) {
         shuffle($array);
-        for($i = count($array);$i>$cant;$i--){
+        for ($i = count($array);$i > $cant;$i--) {
             array_pop($array);
         }
 
@@ -64,12 +64,12 @@ class MultipleChoice{
      * 
      * @return array
      */
-    public function generarPregunta($pregunta){
+    public function generarPregunta($pregunta) {
         $nuevaPregunta['descripcion'] = $pregunta['descripcion'];
         $nuevaPregunta['respuestas'] = $pregunta['respuestas_incorrectas'];
         $cant = count($pregunta['respuestas_correctas']);
-        for($i=0;$i<$cant;$i++){
-            array_push($nuevaPregunta['respuestas'],$pregunta['respuestas_correctas'][$i]);
+        for ($i = 0;$i < $cant;$i++) {
+            array_push($nuevaPregunta['respuestas'], $pregunta['respuestas_correctas'][$i]);
         }
 
         shuffle($nuevaPregunta['respuestas']);
@@ -83,7 +83,7 @@ class MultipleChoice{
      * 
      * @return array
      */
-    public function devolverPreguntas(){
+    public function devolverPreguntas() {
         return $this->preguntas['preguntas'];
     }
 
@@ -92,7 +92,7 @@ class MultipleChoice{
      * 
      * @return array
      */
-    public function devolverPreguntasElegidas(){
+    public function devolverPreguntasElegidas() {
         return $this->preguntasElegidas['preguntas'];
     }
 
@@ -103,7 +103,7 @@ class MultipleChoice{
      * 
      * @return string
      */
-    public function devolverEnunciado($pregunta){
+    public function devolverEnunciado($pregunta) {
         return $pregunta['descripcion'];
     }
 
@@ -112,7 +112,7 @@ class MultipleChoice{
      * 
      * @return int
      */
-    public function devolverCantidad(){
+    public function devolverCantidad() {
         return $this->cantPreguntas;
     }
 
@@ -123,11 +123,11 @@ class MultipleChoice{
      * 
      * @return array
      */
-    public function devolverRespuestas($pregunta){
+    public function devolverRespuestas($pregunta) {
         $aux = $pregunta['respuestas_incorrectas'];
         $cant = count($pregunta['respuestas_correctas']);
-        for($i = 0; $i<$cant;$i++){
-            array_push($aux,$pregunta['respuestas_correctas'][$i]);
+        for ($i = 0;$i < $cant;$i++) {
+            array_push($aux, $pregunta['respuestas_correctas'][$i]);
         }
         return $aux;
     }
@@ -137,17 +137,17 @@ class MultipleChoice{
      * 
      * @return array
      */
-    public function inicializarRespuestas($pregunta){
+    public function inicializarRespuestas($pregunta) {
         $cant = count($pregunta['respuestas_incorrectas']);
 
-        if($cant == 0){
-            array_push($pregunta['respuestas_incorrectas'],'Todas las anteriores');
+        if ($cant == 0) {
+            array_push($pregunta['respuestas_incorrectas'], 'Todas las anteriores');
         }
 
         $cant = count($pregunta['respuestas_correctas']);
 
-        if($cant == 0){
-            array_push($pregunta['respuestas_incorrectas'],'Ninguna de las anteriores');
+        if ($cant == 0) {
+            array_push($pregunta['respuestas_incorrectas'], 'Ninguna de las anteriores');
         }
 
         return $pregunta;
