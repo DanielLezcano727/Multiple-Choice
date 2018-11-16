@@ -91,5 +91,17 @@ class MultipleChoiceTest extends TestCase{
         }
         $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas()[2]), $respuestas);
         
+        // print_r($mult->devolverRespuestas($mult->devolverPreguntas()[2]));
+        // print_r($mult->devolverRespuestasOriginales($mult->devolverPreguntas()[2]));
+    }
+
+    public function testGenerarPregunta(){
+        $mult = new MultipleChoice();
+        
+        for($i=count($preguntas);$i>=12;$i--){
+            array_pop($preguntas);
+        }
+
+        print_r($mult->generarPregunta($mult->devolverPreguntas()[0]));
     }
 }

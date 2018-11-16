@@ -7,6 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 class MultipleChoice{
     protected $cantPreguntas;
     protected $preguntas;
+    protected $preguntasElegidas;
     
     public function __construct($cantPreguntas = 12){
 
@@ -15,7 +16,7 @@ class MultipleChoice{
         if($cantPreguntas < count($this->preguntas['preguntas']) && $cantPreguntas > 0){
             $this->cantPreguntas = $cantPreguntas;
         }else{
-            $this->cantPreguntas = 12;            
+            $this->cantPreguntas = 12;
         }
 
 
@@ -27,10 +28,14 @@ class MultipleChoice{
      * 
      */
     public function organizar(){
+
         $this->preguntas = $this->mezclar($this->preguntas['preguntas'],$this->cantPreguntas);
+        
+        $this->preguntasElegidas = $this->preguntas;
+        
         for($i=0;$i<$this->cantPreguntas;$i++){
             $this->preguntas[$i] = $this->inicializarRespuestas($this->preguntas[$i]);
-            print_r($this->devolverRespuestas($this->preguntas[$i]));
+            $this->preguntas[$i] = $this->generarPregunta($this->preguntas[$i]);
         }
     }
 
@@ -52,12 +57,43 @@ class MultipleChoice{
     }
 
     /**
+     * Crea un array con la respuesta organizada en enunciado y en respuestas
+     * 
+     * @param array $pregunta
+     *    La pregunta que se quiere organizar
+     * 
+     * @return array
+     */
+    public function generarPregunta($pregunta){
+        $nuevaPregunta['descripcion'] = $pregunta['descripcion'];
+        $nuevaPregunta['respuestas'] = $pregunta['respuestas_incorrectas'];
+        $cant = count($pregunta['respuestas_correctas']);
+        for($i=0;$i<$cant;$i++){
+            array_push($nuevaPregunta['respuestas'],$pregunta['respuestas_correctas'][$i]);
+        }
+
+        shuffle($nuevaPregunta['respuestas']);
+
+        return $nuevaPregunta;
+    }
+
+
+    /**
      * Devuelve un array que posee solo las preguntas con sus respuestas
      * 
      * @return array
      */
     public function devolverPreguntas(){
         return $this->preguntas['preguntas'];
+    }
+
+    /**
+     * Devuelve un array que posee solo las preguntas originales con sus respuestas originales
+     * 
+     * @return array
+     */
+    public function devolverPreguntasElegidas(){
+        return $this->preguntasElegidas['preguntas'];
     }
 
     /**
@@ -105,23 +141,15 @@ class MultipleChoice{
         $cant = count($pregunta['respuestas_incorrectas']);
 
         if($cant == 0){
-            $pregunta['respuestas_incorrectas'] = '1Todas las anteriores';
-        }
-
-        for($i=0;$i<$cant;$i++){
-            $pregunta['respuestas_incorrectas'][$i] = "0" . $pregunta['respuestas_incorrectas'][$i];
+            array_push($pregunta['respuestas_incorrectas'],'Todas las anteriores');
         }
 
         $cant = count($pregunta['respuestas_correctas']);
 
         if($cant == 0){
-            $pregunta['respuestas_incorrectas'] = '1Ninguna de las anteriores';
+            array_push($pregunta['respuestas_incorrectas'],'Ninguna de las anteriores');
         }
 
-        for($i=0;$i<$cant;$i++){
-            $pregunta['respuestas_correctas'][$i] = "1" . $pregunta['respuestas_correctas'][$i];
-        }
-        
         return $pregunta;
     }
 }
