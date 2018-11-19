@@ -53,21 +53,24 @@ class MultipleChoiceTest extends TestCase{
     public function testPreguntas(){
         $preguntas = Yaml::parseFile('Preguntas/preguntas.yml');
         $preguntas = $preguntas['preguntas'];
-        $mult = new MultipleChoice();
-        $this->assertEquals($preguntas,$mult->devolverPreguntas());        
+        $mult = new MultipleChoice(12,FALSE);
+        for($i=count($preguntas);$i>12;$i--){
+            array_pop($preguntas);
+        }
+        $this->assertEquals($preguntas,$mult->devolverPreguntas());
     }
 
     public function testEnunciado(){
         $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
-        $mult = new MultipleChoice();
-        for($i = 0; $i < count($preguntas);$i++){
+        $mult = new MultipleChoice(12,FALSE);
+        for($i = 0; $i < 12;$i++){
             $this->assertEquals($preguntas[$i], $mult->devolverPreguntas()[$i]);
         }
     }
 
     public function testRespuestas(){
         $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
-        $mult = new MultipleChoice();
+        $mult = new MultipleChoice(12, FALSE);
         $respuestas = $preguntas[0]['respuestas_incorrectas'];
         $cant = count($preguntas[0]['respuestas_correctas']);
         for($i = 0; $i<$cant;$i++){
@@ -98,10 +101,8 @@ class MultipleChoiceTest extends TestCase{
     public function testGenerarPregunta(){
         $mult = new MultipleChoice();
         
-        for($i=count($preguntas);$i>=12;$i--){
-            array_pop($preguntas);
-        }
+        $preguntas = $mult->devolverPreguntas();
+        // print_r($preguntas);
 
-        print_r($mult->generarPregunta($mult->devolverPreguntas()[0]));
     }
 }
