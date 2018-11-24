@@ -44,8 +44,10 @@ class MultipleChoice {
      * Mezcla las preguntas y elimina las que sobren. Devuelve las preguntas restantes.
      *
      * @param array $array
+     *   Array de preguntas que se va a mezclar
      * @param int $cant
-     *
+     *   Cantidad de preguntas que se van a obtener
+     * 
      * @return array
      */
     public function mezclar($array, $cant) {
@@ -69,11 +71,8 @@ class MultipleChoice {
      */
     public function generarPregunta($pregunta) {
         $nuevaPregunta['descripcion'] = $pregunta['descripcion'];
-        $nuevaPregunta['respuestas'] = $pregunta['respuestas_incorrectas'];
-        $cant = count($pregunta['respuestas_correctas']);
-        for ($i = 0; $i < $cant; $i++) {
-            array_push($nuevaPregunta['respuestas'], $pregunta['respuestas_correctas'][$i]);
-        }
+        
+        $nuevaPregunta['respuestas'] = $this->devolverRespuestas($pregunta);
 
         shuffle($nuevaPregunta['respuestas']);
 
@@ -117,12 +116,7 @@ class MultipleChoice {
      * @return array
      */
     public function devolverRespuestas($pregunta) {
-        $aux = $pregunta['respuestas_incorrectas'];
-        $cant = count($pregunta['respuestas_correctas']);
-        for ($i = 0; $i < $cant; $i++) {
-            array_push($aux, $pregunta['respuestas_correctas'][$i]);
-        }
-        return $aux;
+        return array_merge($pregunta['respuestas_incorrectas'],$pregunta['respuestas_correctas']);
     }
 
     /**

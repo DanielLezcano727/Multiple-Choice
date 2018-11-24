@@ -94,15 +94,35 @@ class MultipleChoiceTest extends TestCase{
         }
         $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas()[2]), $respuestas);
         
-        // print_r($mult->devolverRespuestas($mult->devolverPreguntas()[2]));
-        // print_r($mult->devolverRespuestasOriginales($mult->devolverPreguntas()[2]));
     }
 
     public function testGenerarPregunta(){
         $mult = new MultipleChoice();
         
-        $preguntas = $mult->devolverPreguntas();
-        // print_r($preguntas);
+        $pregunta = $mult->devolverPreguntas()[0];
+        $pregunta = $mult->inicializarRespuestas($pregunta);
+        $preguntaRealizada = $mult->generarPregunta($pregunta);
+        $pregunta['respuestas'] = array_merge($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
+        unset($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
+        
+        $this->assertEquals($pregunta['descripcion'],$preguntaRealizada['descripcion']);
+        $this->assertEquals(count($pregunta['respuestas']),count($preguntaRealizada['respuestas']));
+        foreach($pregunta['respuestas'] as $rtas){
+            $this->assertContains($rtas,$pregunta['respuestas']);
+        }
 
+        $pregunta = $mult->devolverPreguntas()[1];
+        $pregunta = $mult->inicializarRespuestas($pregunta);
+        $preguntaRealizada = $mult->generarPregunta($pregunta);
+        $pregunta['respuestas'] = array_merge($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
+        unset($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
+        
+        $this->assertEquals($pregunta['descripcion'],$preguntaRealizada['descripcion']);
+        $this->assertEquals(count($pregunta['respuestas']),count($preguntaRealizada['respuestas']));
+        foreach($pregunta['respuestas'] as $rtas){
+            $this->assertContains($rtas,$pregunta['respuestas']);
+        }
     }
+
+
 }
