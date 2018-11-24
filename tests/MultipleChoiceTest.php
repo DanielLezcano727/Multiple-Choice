@@ -18,17 +18,17 @@ class MultipleChoiceTest extends TestCase{
         for($i = count($preguntas['preguntas']);$i>12;$i--){
             array_pop($preguntas['preguntas']);
         }
-        $preguntasMezcladas1 = $mult->mezclar($mult->devolverPreguntas(),$mult->devolverCantidad());
+        $preguntasMezcladas1 = $mult->mezclar($mult->devolverPreguntas(0),$mult->devolverCantidad());
         $this->assertNotEquals($preguntas, $preguntasMezcladas1);
         $this->assertEquals(12, count($preguntasMezcladas1) );
 
         $mult = new MultipleChoice();
-        $preguntasMezcladas2 = $mult->mezclar($mult->devolverPreguntas(),$mult->devolverCantidad());
+        $preguntasMezcladas2 = $mult->mezclar($mult->devolverPreguntas(0),$mult->devolverCantidad());
         $this->assertNotEquals($preguntas, $preguntasMezcladas2);
         $this->assertEquals(12, count($preguntasMezcladas2) );
 
         $mult = new MultipleChoice();
-        $preguntasMezcladas3 = $mult->mezclar($mult->devolverPreguntas(),$mult->devolverCantidad());
+        $preguntasMezcladas3 = $mult->mezclar($mult->devolverPreguntas(0),$mult->devolverCantidad());
         $this->assertNotEquals($preguntas, $preguntasMezcladas3);
         $this->assertEquals(12, count($preguntasMezcladas3) );
 
@@ -45,38 +45,38 @@ class MultipleChoiceTest extends TestCase{
         $mult = new MultipleChoice(22);
         $this->assertEquals(22, $mult->devolverCantidad());
         $mult = new MultipleChoice(88);
-        $this->assertEquals(12, $mult->devolverCantidad());
+        $this->assertEquals(25, $mult->devolverCantidad());
         $mult = new MultipleChoice(-88);
-        $this->assertEquals(12, $mult->devolverCantidad());
+        $this->assertEquals(25, $mult->devolverCantidad());
     }
 
     public function testPreguntas(){
         $preguntas = Yaml::parseFile('Preguntas/preguntas.yml');
         $preguntas = $preguntas['preguntas'];
-        $mult = new MultipleChoice(12,FALSE);
+        $mult = new MultipleChoice(12,2,FALSE);
         for($i=count($preguntas);$i>12;$i--){
             array_pop($preguntas);
         }
-        $this->assertEquals($preguntas,$mult->devolverPreguntas());
+        $this->assertEquals($preguntas,$mult->devolverPreguntas(0));
     }
 
     public function testEnunciado(){
         $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
-        $mult = new MultipleChoice(12,FALSE);
+        $mult = new MultipleChoice(12,2,FALSE);
         for($i = 0; $i < 12;$i++){
-            $this->assertEquals($preguntas[$i], $mult->devolverPreguntas()[$i]);
+            $this->assertEquals($preguntas[$i], $mult->devolverPreguntas(0)[$i]);
         }
     }
 
     public function testRespuestas(){
         $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
-        $mult = new MultipleChoice(12, FALSE);
+        $mult = new MultipleChoice(12, 2,FALSE);
         $respuestas = $preguntas[0]['respuestas_incorrectas'];
         $cant = count($preguntas[0]['respuestas_correctas']);
         for($i = 0; $i<$cant;$i++){
             array_push($respuestas,$preguntas[0]['respuestas_correctas'][$i]);
         }
-        $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas()[0]), $respuestas);
+        $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas(0)[0]), $respuestas);
 
 
         $respuestas = $preguntas[1]['respuestas_incorrectas'];
@@ -84,7 +84,7 @@ class MultipleChoiceTest extends TestCase{
         for($i = 0; $i<$cant;$i++){
             array_push($respuestas,$preguntas[1]['respuestas_correctas'][$i]);
         }
-        $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas()[1]), $respuestas);
+        $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas(0)[1]), $respuestas);
         
         
         $respuestas = $preguntas[2]['respuestas_incorrectas'];
@@ -92,14 +92,14 @@ class MultipleChoiceTest extends TestCase{
         for($i = 0; $i<$cant;$i++){
             array_push($respuestas,$preguntas[2]['respuestas_correctas'][$i]);
         }
-        $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas()[2]), $respuestas);
+        $this->assertEquals($mult->devolverRespuestas($mult->devolverPreguntas(0)[2]), $respuestas);
         
     }
 
     public function testGenerarPregunta(){
         $mult = new MultipleChoice();
         
-        $pregunta = $mult->devolverPreguntas()[0];
+        $pregunta = $mult->devolverPreguntas(0)[0];
         $pregunta = $mult->inicializarRespuestas($pregunta);
         $preguntaRealizada = $mult->generarPregunta($pregunta);
         $pregunta['respuestas'] = array_merge($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
@@ -110,7 +110,7 @@ class MultipleChoiceTest extends TestCase{
             $this->assertContains($rtas,$pregunta['respuestas']);
         }
 
-        $pregunta = $mult->devolverPreguntas()[1];
+        $pregunta = $mult->devolverPreguntas(0)[1];
         $pregunta = $mult->inicializarRespuestas($pregunta);
         $preguntaRealizada = $mult->generarPregunta($pregunta);
         $pregunta['respuestas'] = array_merge($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
@@ -121,5 +121,11 @@ class MultipleChoiceTest extends TestCase{
             $this->assertContains($rtas,$pregunta['respuestas']);
         }
     }
-
+    
+    public function testMostrar(){
+        $mult = new MultipleChoice(10,2);
+        // print_r($mult->multipleChoice());
+        print_r($mult->tema[0]);
+        print_r($mult->tema[1]);
+    }
 }

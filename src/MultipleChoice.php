@@ -7,42 +7,46 @@ use Symfony\Component\Yaml\Yaml;
 class MultipleChoice {
     protected $cantPreguntas;
     protected $preguntas;
-    protected $preguntasElegidas;
+    protected $temaCorrecto;
     protected $mezclarPreguntas;
+    public $tema;
 
-    public function __construct($cantPreguntas = 12, $mezclar = TRUE) {
+    public function __construct($cantPreguntas = 12, $temas = 2, $mezclar = TRUE) {
 
-        $this->preguntas = Yaml::parseFile('Preguntas/preguntas.yml');
-
-        if ($cantPreguntas <= count($this->preguntas['preguntas']) && $cantPreguntas > 0) {
+        $preguntasCompletas = Yaml::parseFile('Preguntas/preguntas.yml');
+        $cantPreguntasArchivo = count($preguntasCompletas['preguntas']);
+        if ($cantPreguntas <= $cantPreguntasArchivo && $cantPreguntas > 0) {
             $this->cantPreguntas = $cantPreguntas;
         } else {
-            $this->cantPreguntas = 12;
+            $this->cantPreguntas = $cantPreguntasArchivo;
         }
         $this->mezclarPreguntas = $mezclar;
-        $this->organizar();
+        for($i=0;$i<$temas;$i++){
+            $this->tema[$i] = $this->organizar($preguntasCompletas, $i);
+        }
     }
 
     /**
      * Mezcla las preguntas y elige las que van a ser utilizadas para el examen
      *
      */
-    public function organizar() {
+    public function organizar($preguntas, $tema) {
 
-        $this->preguntas = $this->mezclar($this->preguntas['preguntas'], $this->cantPreguntas);
+        $preguntas = $this->mezclar($preguntas['preguntas'], $this->cantPreguntas);
 
 
-        $this->preguntasElegidas = $this->preguntas;
+        $this->temaCorrecto[$tema] = $preguntas;
 
         for ($i = 0; $i < $this->cantPreguntas; $i++) {
-            $this->preguntas[$i] = $this->inicializarRespuestas($this->preguntas[$i]);
-            $this->preguntas[$i] = $this->generarPregunta($this->preguntas[$i]);
+            $preguntas[$i] = $this->inicializarRespuestas($preguntas[$i]);
+            $preguntas[$i] = $this->generarPregunta($preguntas[$i]);
         }
+        return $preguntas;
     }
 
     public function multipleChoice(){
         $mostrar = "";
-        foreach($this->preguntas as $preg){
+        foreach($this->tema[0] as $preg){
             $mostrar .= $this->devolverEnunciado($preg) . "\n";
             foreach($preg['respuestas'] as $rtas){
                 $mostrar .= "   " . $rtas . "\n";
@@ -114,8 +118,8 @@ class MultipleChoice {
      *
      * @return array
      */
-    public function devolverPreguntas() {
-        return $this->preguntasElegidas;
+    public function devolverPreguntas($tema) {
+        return $this->temaCorrecto[$tema];
     }
 
     /**
