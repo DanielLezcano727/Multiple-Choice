@@ -106,7 +106,6 @@ class MultipleChoiceTest extends TestCase{
         unset($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
         
         $this->assertEquals($pregunta['descripcion'],$preguntaRealizada['descripcion']);
-        $this->assertEquals(count($pregunta['respuestas']),count($preguntaRealizada['respuestas']));
         foreach($pregunta['respuestas'] as $rtas){
             $this->assertContains($rtas,$pregunta['respuestas']);
         }
@@ -118,11 +117,9 @@ class MultipleChoiceTest extends TestCase{
         unset($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
         
         $this->assertEquals($pregunta['descripcion'],$preguntaRealizada['descripcion']);
-        $this->assertEquals(count($pregunta['respuestas']),count($preguntaRealizada['respuestas']));
         foreach($pregunta['respuestas'] as $rtas){
             $this->assertContains($rtas,$pregunta['respuestas']);
         }
     }
-
-
+    
 }

@@ -76,6 +76,24 @@ class MultipleChoice {
 
         shuffle($nuevaPregunta['respuestas']);
 
+        $cant = count($nuevaPregunta['respuestas']);
+
+        $opcionesFinales = [];
+
+        for($i=0;$i<$cant;$i++){
+            $todas = $nuevaPregunta['respuestas'][$i] == "Todas las anteriores";
+            $ninguna = $nuevaPregunta['respuestas'][$i] == "Ninguna de las anteriores";
+            if($todas || $ninguna){
+                array_push($opcionesFinales,$nuevaPregunta['respuestas'][$i]);
+                unset($nuevaPregunta['respuestas'][$i]);
+            }
+        }
+        if(count($opcionesFinales) == 2 && $opcionesFinales[0] == "Ninguna de las anteriores"){
+            $tmp = $opcionesFinales[0];
+            $opcionesFinales[0] = $opcionesFinales[1];
+            $opcionesFinales[1] = $tmp;
+        }
+        $nuevaPregunta['respuestas'] = array_merge($nuevaPregunta['respuestas'],$opcionesFinales);
         return $nuevaPregunta;
     }
 
@@ -127,16 +145,28 @@ class MultipleChoice {
     public function inicializarRespuestas($pregunta) {
         $cant = count($pregunta['respuestas_incorrectas']);
 
-        if ($cant == 0) {
+        $todasLasAnteriores = TRUE;
+
+        if(array_key_exists('ocultar_opcion_todas_las_anteriores',$pregunta)){
+            $todasLasAnteriores = $pregunta['ocultar_opcion_todas_las_anteriores'];
+        }
+
+        if (($cant == 0 || rand(0,100) % 3 == 0) && $todasLasAnteriores) {
             array_push($pregunta['respuestas_incorrectas'], 'Todas las anteriores');
         }
 
         $cant = count($pregunta['respuestas_correctas']);
 
-        if ($cant == 0) {
-            array_push($pregunta['respuestas_incorrectas'], 'Ninguna de las anteriores');
+        $ningunaLasAnteriores = TRUE;
+
+        if(array_key_exists('ocultas_opcion_ninguna_de_las_anteriores',$pregunta)){
+            $ningunaLasAnteriores = $pregunta['ocultas_opcion_ninguna_de_las_anteriores'];
         }
 
+        if (($cant == 0 || rand(0,100) % 3 == 0) && $ningunaLasAnteriores) {
+            array_push($pregunta['respuestas_incorrectas'], 'Ninguna de las anteriores');
+        }
+        
         return $pregunta;
     }
 }
