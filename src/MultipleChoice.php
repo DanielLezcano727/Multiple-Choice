@@ -14,7 +14,7 @@ class MultipleChoice {
 
         $this->preguntas = Yaml::parseFile('Preguntas/preguntas.yml');
 
-        if ($cantPreguntas < count($this->preguntas['preguntas']) && $cantPreguntas > 0) {
+        if ($cantPreguntas <= count($this->preguntas['preguntas']) && $cantPreguntas > 0) {
             $this->cantPreguntas = $cantPreguntas;
         } else {
             $this->cantPreguntas = 12;
@@ -38,6 +38,18 @@ class MultipleChoice {
             $this->preguntas[$i] = $this->inicializarRespuestas($this->preguntas[$i]);
             $this->preguntas[$i] = $this->generarPregunta($this->preguntas[$i]);
         }
+    }
+
+    public function multipleChoice(){
+        $mostrar = "";
+        foreach($this->preguntas as $preg){
+            $mostrar .= $this->devolverEnunciado($preg) . "\n";
+            foreach($preg['respuestas'] as $rtas){
+                $mostrar .= "   " . $rtas . "\n";
+            }
+            $mostrar .= "\n\n\n";
+        }
+        return $mostrar;
     }
 
     /**
@@ -143,30 +155,26 @@ class MultipleChoice {
      * @return array
      */
     public function inicializarRespuestas($pregunta) {
-        $cant = count($pregunta['respuestas_incorrectas']);
 
-        $todasLasAnteriores = TRUE;
+        $todasLasAnteriores = FALSE;
 
         if(array_key_exists('ocultar_opcion_todas_las_anteriores',$pregunta)){
             $todasLasAnteriores = $pregunta['ocultar_opcion_todas_las_anteriores'];
         }
 
-        if (($cant == 0 || rand(0,100) % 3 == 0) && $todasLasAnteriores) {
+        if(!$todasLasAnteriores){
             array_push($pregunta['respuestas_incorrectas'], 'Todas las anteriores');
         }
 
-        $cant = count($pregunta['respuestas_correctas']);
-
-        $ningunaLasAnteriores = TRUE;
+        $ningunaLasAnteriores = FALSE;
 
         if(array_key_exists('ocultas_opcion_ninguna_de_las_anteriores',$pregunta)){
             $ningunaLasAnteriores = $pregunta['ocultas_opcion_ninguna_de_las_anteriores'];
         }
 
-        if (($cant == 0 || rand(0,100) % 3 == 0) && $ningunaLasAnteriores) {
+        if(!$ningunaLasAnteriores){
             array_push($pregunta['respuestas_incorrectas'], 'Ninguna de las anteriores');
         }
-        
         return $pregunta;
     }
 }
