@@ -164,6 +164,8 @@ class MultipleChoice {
     /**
      * Recuerda las respuestas correctas e incorrectas y devuelve la pregunta con las respuestas modificadas
      *
+     * @param array $pregunta
+     *    $pregunta que se quiere inicializar
      * @return array
      */
     public function inicializarRespuestas($pregunta) {

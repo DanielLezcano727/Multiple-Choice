@@ -187,4 +187,12 @@ class MultipleChoiceTest extends TestCase{
         $this->assertNotNull($mult->cabecera(0));
         $this->assertNotNull($mult->generarPrueba(0, TRUE));
     }
+    
+    public function testInicializarTespuestas(){
+        $mult = new MultipleChoice(12,2,FALSE);
+        $pregunta1 = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'][0];
+        $pregunta = $pregunta1;
+        array_push($pregunta1['respuestas_incorrectas'],"Ninguna de las anteriores");
+        $this->assertEquals($pregunta1, $mult->inicializarRespuestas($pregunta));
+    }
 }
