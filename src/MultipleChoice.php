@@ -221,20 +221,9 @@ class MultipleChoice {
             return [$preguntaMezclada, $pregunta];
         }
         $preguntaMezclada['respuestas'] = array_values($preguntaMezclada['respuestas']);
-        $correctas = [];
-        $nocorrectas = [];
         $cantRespuestas = count($preguntaMezclada['respuestas']);
-        for ($i = 0;$i < count($preguntaMezclada['respuestas']);$i++) {
-            array_push($nocorrectas, chr($i + ord('A')));
-        }
-        for ($i = 0;$i < $cantCorrectas;$i++) {
-            $correcta = $pregunta['respuestas_correctas'][$i];
-            for ($j = 0;$j < $cantRespuestas;$j++) {
-                if ($preguntaMezclada['respuestas'][$j] == $correcta) {
-                    array_push($correctas, chr($j + ord('A')));
-                }
-            }
-        }
+        $nocorrectas = $this->inicializarArrayNoCorrectas(count($preguntaMezclada['respuestas']));
+        $correctas = $this->inicializarArrayCorrectas($pregunta,$preguntaMezclada);
 
         $aux = $pregunta['respuestas_correctas'];
         unset($pregunta['respuestas_correctas']);
@@ -260,6 +249,29 @@ class MultipleChoice {
         array_push($preguntaMezclada['respuestas'], $correctasOpc);
         array_push($pregunta['respuestas_correctas'], $correctasOpc);
         return [$preguntaMezclada, $pregunta];
+    }
+
+    public function inicializarArrayNoCorrectas($cant){
+        $aux = [];
+        for ($i = 0;$i < $cant;$i++) {
+            array_push($aux, chr($i + ord('A')));
+        }
+        return $aux;
+    }
+
+    public function inicializarArrayCorrectas($pregunta,$preguntaMezclada){
+        $cantRespuestas = count($preguntaMezclada['respuestas']);
+        $cantCorrectas = count($pregunta['respuestas_correctas']);
+        $correctas = [];
+        for ($i = 0;$i < $cantCorrectas;$i++) {
+            $correcta = $pregunta['respuestas_correctas'][$i];
+            for ($j = 0;$j < $cantRespuestas;$j++) {
+                if ($preguntaMezclada['respuestas'][$j] == $correcta) {
+                    array_push($correctas, chr($j + ord('A')));
+                }
+            }
+        }
+        return $correctas;
     }
 
     public function generarPrueba($tema, $resolucion) {
