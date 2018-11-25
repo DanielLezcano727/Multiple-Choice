@@ -133,4 +133,13 @@ class MultipleChoiceTest extends TestCase{
         $opcionesFinalesaux = $mult->swapOpcionesFinales($opcionesFinalesaux);
         $this->assertEquals($opcionesFinales,$opcionesFinalesaux);
     }
+
+    public function testTextoNingunaDeLasAnteriores(){
+        $mult = new MultipleChoice(12,2,FALSE);
+        $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
+        $this->assertEquals("Ninguna de las anteriores", $mult->textoNingunaDeLasAnteriores($preguntas[0]));
+        $this->assertEquals("Ninguna de las anteriores", $mult->textoNingunaDeLasAnteriores($preguntas[1]));
+        $this->assertEquals("Ninguno de los anteriores.", $mult->textoNingunaDeLasAnteriores($preguntas[12]));
+        
+    }
 }

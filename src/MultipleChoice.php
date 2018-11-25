@@ -206,6 +206,14 @@ class MultipleChoice {
         return $pregunta;
     }
 
+    /**
+     * Si existe el indice "texto_ninguna_de_las_anteriores" devolvera ese texto, sino devolver "Ninguna de las anteriores"
+     * 
+     * @param array $pregunta
+     *    Pregunta que puede poseer la opcion texto_ninguna_de_las_anteriores
+     * 
+     * @return string
+     */
     public function textoNingunaDeLasAnteriores($pregunta){
         if (array_key_exists('texto_ninguna_de_las_anteriores', $pregunta)) {
             return $pregunta['texto_ninguna_de_las_anteriores'];
