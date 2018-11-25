@@ -328,6 +328,20 @@ class MultipleChoice {
         return $mostrar;
     }
 
+    /**
+     * Devuelve si es pedido la resolucion de la pregunta
+     * 
+     * @param array $preg
+     *   Pregunta de la que se quiere saber la respuesta
+     * @param bool $resolucion
+     *   Booleano que determina si se quiere obtener la respuesta
+     * @param int $tema
+     *   Tema del cual se quiere obtener la respuesta
+     * @param int $preguntaNro
+     *   Numero de la pregunta de la cual se quiere obtener la respuesta
+     * 
+     * @return string
+     */
     public function respuesta($preg,$resolucion,$tema,$preguntaNro){
         if ($resolucion) {
             $contador = 0;

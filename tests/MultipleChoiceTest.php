@@ -155,4 +155,12 @@ class MultipleChoiceTest extends TestCase{
         $this->assertEquals($mult->inicializarArrayNoCorrectas(5),['A','B','C','D','E']);
         $this->assertEquals($mult->inicializarArrayNoCorrectas(3),['A','B','C']);
     }
+
+    public function testRespuestaHTML(){
+        $mult = new MultipleChoice(12,2,FALSE);
+        $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
+        $pregunta['respuestas'] = array_merge($preguntas[0]['respuestas_correctas'],$preguntas[0]['respuestas_incorrectas']);
+        $this->assertEquals($mult->respuesta($pregunta,TRUE,0,0),'A');
+        $this->assertEquals($mult->respuesta($pregunta,FALSE,0,0),'');
+    }
 }
