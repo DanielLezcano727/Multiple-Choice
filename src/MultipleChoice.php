@@ -240,6 +240,17 @@ class MultipleChoice {
         return 'respuestas_incorrectas'; 
     }
 
+    /**
+     * Si la pregunta tiene mas de una opcion correcta, genera una opcion que las posee a todas, opciones 
+     * en conjunto que son incorrectas y remueve las opciones correctas a las incorrectas, dejando como correcta la unica opcion que se genero
+     * 
+     * @param array $preguntaMezclada
+     *    Pregunta en la que se va a generar la respuesta en conjunto
+     * @param array $pregunta
+     *    Pregunta en la que se pueden identificar las respuestas correctas
+     * 
+     * @return array
+     */
     public function generarVariasCorrectas($preguntaMezclada, $pregunta) {
         $cantCorrectas = count($pregunta['respuestas_correctas']);
         
