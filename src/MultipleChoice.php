@@ -226,6 +226,12 @@ class MultipleChoice {
                 }
             }
         }
+
+        $aux = $pregunta['respuestas_correctas'];
+        unset($pregunta['respuestas_correctas']);
+        $pregunta['respuestas_incorrectas'] = array_merge($pregunta['respuestas_incorrectas'],$aux);
+        $pregunta['respuestas_correctas'] = [];
+
         unset($nocorrectas[array_search($correctas[0],$nocorrectas)]);
         for($i=0;$i<2;$i++){
             $aux = array_rand($nocorrectas,2);
@@ -240,9 +246,12 @@ class MultipleChoice {
             $correctasOpc .= ", " . $correctas[$i];
         }
         $correctasOpc .= " y " . $correctas[$cantCorrectas-1];
+
+        
         array_push($preguntaMezclada['respuestas'],$correctasOpc);
         array_push($pregunta['respuestas_correctas'],$correctasOpc);
         
+        print_r($pregunta);
         return [$preguntaMezclada,$pregunta];
     }
 }
