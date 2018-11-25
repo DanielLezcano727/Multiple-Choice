@@ -9,7 +9,7 @@ class MultipleChoice {
     protected $preguntas;
     protected $temaCorrecto;
     protected $mezclarPreguntas;
-    public $tema;
+    protected $tema;
 
     public function __construct($cantPreguntas = 12, $temas = 2, $mezclar = TRUE) {
 
@@ -39,22 +39,49 @@ class MultipleChoice {
 
         for ($i = 0; $i < $this->cantPreguntas; $i++) {
             $preguntas[$i] = $this->inicializarRespuestas($preguntas[$i]);
-            $preguntas[$i] = $this->generarPregunta($preguntas[$i]);
+            $this->temaCorrectoAux[$tema][$i] = $preguntas[$i];
+            $preguntas[$i] = $this->generarPregunta($preguntas[$i], $tema, $i);
         }
         return $preguntas;
     }
 
-    public function multipleChoice($tema){
-        $mostrar = "";
+    public function generarPrueba($tema,$resolucion){
+        $mostrar =$this->cabecera($tema);
+        $preguntaNro = 1;
         foreach($this->tema[$tema] as $preg){
-            $mostrar .= $this->devolverEnunciado($preg) . "\n";
+            $mostrar .= "<div class='question'>
+            <div class='number'>" . $preguntaNro . ")__";
+            if($resolucion){
+                $contador = 0;
+                foreach($preg['respuestas'] as $rta){
+                    if($rta == $this->temaCorrectoAux[$tema][$preguntaNro-1]['respuestas_correctas'][0]){
+                        break;
+                    }
+                    $contador++;
+                }
+                $mostrar .= chr($contador+ord('A')) . "__</div>";
+            }else{
+                $mostrar .= "____</div>";                
+            }
+            
+            $mostrar .= "\n<div class='description'>" . $this->devolverEnunciado($preg) . "</div>
+            <div class='options short'>";
             $cantResp = 0;
             foreach($preg['respuestas'] as $rtas){
-                $mostrar .= "   " . chr($cantResp + ord('A')). ")" . $rtas . "\n";
+                $mostrar .= "
+                <div class='option'>" . chr($cantResp + ord('A')) . ")";
+                $mostrar .= $rtas . "</div>";
                 $cantResp++;
             }
-            $mostrar .= "\n\n\n";
+            $mostrar .= "
+            </div>
+          </div>";
+            $preguntaNro++;
         }
+        $mostrar .= "
+        </div>
+      </body>
+    </html>";
         return $mostrar;
     }
 
@@ -87,7 +114,7 @@ class MultipleChoice {
      *
      * @return array
      */
-    public function generarPregunta($pregunta) {
+    public function generarPregunta($pregunta, $tema, $numero) {
         $nuevaPregunta['descripcion'] = $pregunta['descripcion'];
         
         $nuevaPregunta['respuestas'] = $this->devolverRespuestas($pregunta);
@@ -101,12 +128,13 @@ class MultipleChoice {
         for($i=0;$i<$cant;$i++){
             $todas = $nuevaPregunta['respuestas'][$i] == "Todas las anteriores";
             $ninguna = $nuevaPregunta['respuestas'][$i] == "Ninguna de las anteriores";
+            $ninguna = $ninguna || $nuevaPregunta['respuestas'][$i] == "Ninguno de los anteriores.";
             if($todas || $ninguna){
                 array_push($opcionesFinales,$nuevaPregunta['respuestas'][$i]);
                 unset($nuevaPregunta['respuestas'][$i]);
             }
         }
-        if(count($opcionesFinales) == 2 && $opcionesFinales[0] == "Ninguna de las anteriores"){
+        if(count($opcionesFinales) == 2 && ($opcionesFinales[0] == "Ninguna de las anteriores" || $opcionesFinales[0] == "Ninguno de los anteriores.")){
             $tmp = $opcionesFinales[0];
             $opcionesFinales[0] = $opcionesFinales[1];
             $opcionesFinales[1] = $tmp;
@@ -114,6 +142,7 @@ class MultipleChoice {
         $aux = $this->generarVariasCorrectas($nuevaPregunta,$pregunta);
         $nuevaPregunta = $aux[0];
         $pregunta = $aux[1];
+        $this->temaCorrectoAux[$tema][$numero] = $aux[1];
         $nuevaPregunta['respuestas'] = array_merge($nuevaPregunta['respuestas'],$opcionesFinales);
         return $nuevaPregunta;
     }
@@ -179,7 +208,7 @@ class MultipleChoice {
                 $tipo = 'respuestas_correctas';
                 $aux = $pregunta[$tipo];
                 unset($pregunta[$tipo]);
-                $pregunta['respuestas_incorrectas'] = $aux;
+                $pregunta['respuestas_incorrectas'] = array_merge($pregunta['respuestas_incorrectas'],$aux);
                 $pregunta[$tipo] = [];
             }else{
                 $tipo = 'respuestas_incorrectas'; 
@@ -195,13 +224,21 @@ class MultipleChoice {
         $cantCorrectas = count($pregunta['respuestas_correctas']);
         if(!$ningunaLasAnteriores){
             $tipo = "";
-            if($cantIncorrectas == 0){
+            if($cantCorrectas == 0){
                 $tipo = 'respuestas_correctas';
             }else{
                 $tipo = 'respuestas_incorrectas'; 
             }
-            array_push($pregunta['respuestas_incorrectas'], 'Ninguna de las anteriores');
+
+            if(array_key_exists('texto_ninguna_de_las_anteriores',$pregunta)){
+                $texto = $pregunta['texto_ninguna_de_las_anteriores'];
+            }else{
+                $texto = 'Ninguna de las anteriores';
+            }
+
+            array_push($pregunta[$tipo], $texto);
         }
+        
         return $pregunta;
     }
 
@@ -250,8 +287,64 @@ class MultipleChoice {
         
         array_push($preguntaMezclada['respuestas'],$correctasOpc);
         array_push($pregunta['respuestas_correctas'],$correctasOpc);
-        
-        print_r($pregunta);
         return [$preguntaMezclada,$pregunta];
+    }
+
+    public function cabecera($tema){
+        $aux = '
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Exam</title>
+            <meta charset="utf-8">
+            <meta name="description" content="">
+            <meta name=viewport content="width=device-width, initial-scale=1">
+        
+            <style>
+              .question {
+                  border: 1px solid gray;
+                  padding: 0.3em;
+              }
+              .number {
+                  float: left;
+                  margin-right: 0.5em;
+                  font-weight: bold;
+              }
+              .options {
+                  display: flex;
+                  flex-direction: column;
+              }
+              .short {
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  grid-gap: 1em;
+              }
+              .questions {
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  grid-gap: 1em 1em;
+              }
+              .header {
+                  display: flex;
+                  justify-content: space-between;
+                  margin-bottom: 1em;
+              }
+              .description {
+                  margin-bottom: 0.5em;
+                  font-weight: bold;
+              }
+              body {
+                font-size: 12px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <strong>Nombre y Apellido _____________________________________________ </strong>
+              <strong>Evaluación número 1 ' . date("d/m/y",time()) .'</strong>
+              <strong>TEMA ' . ($tema+1) . '</strong>
+              </div>
+              <div class="questions">';
+        return $aux;
     }
 }

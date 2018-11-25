@@ -101,7 +101,7 @@ class MultipleChoiceTest extends TestCase{
         
         $pregunta = $mult->devolverPreguntas(0)[0];
         $pregunta = $mult->inicializarRespuestas($pregunta);
-        $preguntaRealizada = $mult->generarPregunta($pregunta);
+        $preguntaRealizada = $mult->generarPregunta($pregunta,1,1);
         $pregunta['respuestas'] = array_merge($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
         unset($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
         
@@ -112,7 +112,7 @@ class MultipleChoiceTest extends TestCase{
 
         $pregunta = $mult->devolverPreguntas(0)[1];
         $pregunta = $mult->inicializarRespuestas($pregunta);
-        $preguntaRealizada = $mult->generarPregunta($pregunta);
+        $preguntaRealizada = $mult->generarPregunta($pregunta,1,1);
         $pregunta['respuestas'] = array_merge($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
         unset($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
         
@@ -121,5 +121,5 @@ class MultipleChoiceTest extends TestCase{
             $this->assertContains($rtas,$pregunta['respuestas']);
         }
     }
-    
+
 }
