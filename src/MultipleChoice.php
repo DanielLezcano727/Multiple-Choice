@@ -213,7 +213,11 @@ class MultipleChoice {
         }
         $preguntaMezclada['respuestas'] = array_values($preguntaMezclada['respuestas']);
         $correctas = [];
+        $nocorrectas = [];
         $cantRespuestas = count($preguntaMezclada['respuestas']);
+        for($i=0;$i<count($preguntaMezclada['respuestas']);$i++){
+            array_push($nocorrectas,chr($i + ord('A')));
+        }
         for($i=0;$i<$cantCorrectas;$i++){
             $correcta = $pregunta['respuestas_correctas'][$i];
             for($j=0;$j<$cantRespuestas;$j++){
@@ -221,6 +225,14 @@ class MultipleChoice {
                     array_push($correctas, chr($j + ord('A')));
                 }
             }
+        }
+        unset($nocorrectas[array_search($correctas[0],$nocorrectas)]);
+        for($i=0;$i<2;$i++){
+            $aux = array_rand($nocorrectas,2);
+            $aux2 = $nocorrectas[$aux[0]] . " y " . $nocorrectas[$aux[1]];
+            unset($nocorrectas[$aux[0]]);
+            array_push($preguntaMezclada['respuestas'], $aux2);
+            array_push($pregunta['respuestas_incorrectas'], $aux2);
         }
         sort($correctas);
         $correctasOpc = $correctas[0];
@@ -230,6 +242,7 @@ class MultipleChoice {
         $correctasOpc .= " y " . $correctas[$cantCorrectas-1];
         array_push($preguntaMezclada['respuestas'],$correctasOpc);
         array_push($pregunta['respuestas_correctas'],$correctasOpc);
+        
         return [$preguntaMezclada,$pregunta];
     }
 }
