@@ -305,6 +305,16 @@ class MultipleChoice {
         return $correctas;
     }
 
+    /**
+     * Funcion encargada de generar la prueba en formato HTML
+     * 
+     * @param int $tema
+     *   Tema que se quiere generar
+     * @param bool $resolucion
+     *   Parametro que indica si se quiere visualizar la resolucion de la prueba
+     * 
+     * @return string
+     */
     public function generarPrueba($tema, $resolucion) {
         $mostrar = $this->cabecera($tema);
         $preguntaNro = 1;

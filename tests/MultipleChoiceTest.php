@@ -182,8 +182,9 @@ class MultipleChoiceTest extends TestCase{
         $this->assertEquals($aux, $mult->mostrarRespuestas($pregunta2));
     }
 
-    public function testCabeceraHTML(){
+    public function testCabeceraHTMLyGenerarPrueba(){
         $mult = new MultipleChoice();
         $this->assertNotNull($mult->cabecera(0));
+        $this->assertNotNull($mult->generarPrueba(0, TRUE));
     }
 }
