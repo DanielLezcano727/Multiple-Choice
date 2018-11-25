@@ -376,6 +376,14 @@ class MultipleChoice {
         return $aux;
     }
 
+    /**
+     * Devuelve la cabecera del examen en formato html
+     * 
+     * @param int $tema
+     *    Tema del cual se quiere hacer la cabecera
+     * 
+     * @return string
+     */
     public function cabecera($tema) {
         $aux = '
         <!DOCTYPE html>
