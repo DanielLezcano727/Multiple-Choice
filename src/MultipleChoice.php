@@ -222,6 +222,14 @@ class MultipleChoice {
         
     }
 
+    /**
+     * Devuelve el indice donde se debe guardar la respuesta "Ninguna de las anteriores"
+     * 
+     * @param array $pregunta
+     *    Array donde se va a guardar la opcion
+     * 
+     * @return string
+     */
     public function ningunaDeLasAnteriores($pregunta){
         $cantCorrectas = count($pregunta);
         if ($cantCorrectas == 0) {

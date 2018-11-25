@@ -139,7 +139,14 @@ class MultipleChoiceTest extends TestCase{
         $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
         $this->assertEquals("Ninguna de las anteriores", $mult->textoNingunaDeLasAnteriores($preguntas[0]));
         $this->assertEquals("Ninguna de las anteriores", $mult->textoNingunaDeLasAnteriores($preguntas[1]));
-        $this->assertEquals("Ninguno de los anteriores.", $mult->textoNingunaDeLasAnteriores($preguntas[12]));
-        
+        $this->assertEquals("Ninguno de los anteriores.", $mult->textoNingunaDeLasAnteriores($preguntas[12]));   
+    }
+
+    public function testNingunaDeLasAnteriores(){
+        $mult = new MultipleChoice();
+        $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
+        $this->assertEquals("respuestas_incorrectas", $mult->ningunaDeLasAnteriores($preguntas[0]['respuestas_correctas']));
+        $this->assertEquals("respuestas_correctas", $mult->ningunaDeLasAnteriores($preguntas[1]['respuestas_correctas']));
+        $this->assertEquals("respuestas_incorrectas", $mult->ningunaDeLasAnteriores($preguntas[2]['respuestas_correctas']));
     }
 }
