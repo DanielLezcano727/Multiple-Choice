@@ -290,6 +290,16 @@ class MultipleChoice {
         return $aux;
     }
 
+    /**
+     * Devuelve un array con las opciones que son las respuestas correctas
+     * 
+     * @param array $pregunta
+     *    Pregunta que posee la respuesta correcta
+     * @param array $preguntaMezclada
+     *    Pregunta de la que se quiere saber la posicion de la respuesta correcta
+     * 
+     * @return array
+     */
     public function inicializarArrayCorrectas($pregunta,$preguntaMezclada){
         $cantRespuestas = count($preguntaMezclada['respuestas']);
         $cantCorrectas = count($pregunta['respuestas_correctas']);
