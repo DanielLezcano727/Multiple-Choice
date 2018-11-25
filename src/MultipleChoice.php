@@ -356,6 +356,14 @@ class MultipleChoice {
         return "";             
     }
 
+    /**
+     * Devuelve las respuestas de una pregunta en formato html
+     * 
+     * @param array $preg
+     *    Pregunta de la que se quieren devolver las respuestas
+     * 
+     * @return string
+     */
     public function mostrarRespuestas($preg){
         $cantResp = 0;
         $aux = "";

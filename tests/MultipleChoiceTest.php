@@ -163,4 +163,22 @@ class MultipleChoiceTest extends TestCase{
         $this->assertEquals($mult->respuesta($pregunta,TRUE,0,0),'A');
         $this->assertEquals($mult->respuesta($pregunta,FALSE,0,0),'');
     }
+
+    public function testMostrarRespuestas(){
+        $mult = new MultipleChoice(12,2,FALSE);
+        $pregunta = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'][0];
+        $pregunta2['respuestas'] = array_merge($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
+        $pregunta['respuestas_correctas'][0] = "
+            <div class='option'>A)" . $pregunta['respuestas_correctas'][0] . "</div>";
+        $pregunta['respuestas_incorrectas'][0] = "
+            <div class='option'>B)" . $pregunta['respuestas_incorrectas'][0] . "</div>";
+        $pregunta['respuestas_incorrectas'][1] = "
+            <div class='option'>C)" . $pregunta['respuestas_incorrectas'][1] . "</div>";
+        $pregunta['respuestas_incorrectas'][2] = "
+            <div class='option'>D)" . $pregunta['respuestas_incorrectas'][2] . "</div>";
+        $aux = $pregunta['respuestas_correctas'][0] . $pregunta['respuestas_incorrectas'][0];
+        $aux = $aux . $pregunta['respuestas_incorrectas'][1] . $pregunta['respuestas_incorrectas'][2];
+
+        $this->assertEquals($aux, $mult->mostrarRespuestas($pregunta2));
+    }
 }
