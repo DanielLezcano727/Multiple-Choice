@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class MultipleChoiceTest extends TestCase{
 
-    public function testPrimero(){
+    public function testCrearMultipleChoice(){
         $MultChoice = new MultipleChoice();
         $this->assertTrue(isset($MultChoice));
     }
@@ -64,7 +64,7 @@ class MultipleChoiceTest extends TestCase{
         $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
         $mult = new MultipleChoice(12,2,FALSE);
         for($i = 0; $i < 12;$i++){
-            $this->assertEquals($preguntas[$i], $mult->devolverPreguntas(0)[$i]);
+            $this->assertEquals($preguntas[$i]['descripcion'], $mult->devolverEnunciado($mult->devolverPreguntas(0)[$i]));
         }
     }
 
@@ -122,4 +122,77 @@ class MultipleChoiceTest extends TestCase{
         }
     }
 
+    public function testSwapOpcionesFinales(){
+        $mult = new MultipleChoice();
+        $opcionesFinales = ['Todas las anteriores','Ninguna de las anteriores'];
+        $opcionesFinalesaux = ['Ninguna de las anteriores','Todas las anteriores'];
+        $opcionesFinalesaux = $mult->swapOpcionesFinales($opcionesFinalesaux);
+        $this->assertEquals($opcionesFinales,$opcionesFinalesaux);
+        $opcionesFinales = ['Todas las anteriores','Ninguno de los anteriores.'];
+        $opcionesFinalesaux = ['Ninguno de los anteriores.','Todas las anteriores'];
+        $opcionesFinalesaux = $mult->swapOpcionesFinales($opcionesFinalesaux);
+        $this->assertEquals($opcionesFinales,$opcionesFinalesaux);
+    }
+
+    public function testTextoNingunaDeLasAnteriores(){
+        $mult = new MultipleChoice(12,2,FALSE);
+        $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
+        $this->assertEquals("Ninguna de las anteriores", $mult->textoNingunaDeLasAnteriores($preguntas[0]));
+        $this->assertEquals("Ninguna de las anteriores", $mult->textoNingunaDeLasAnteriores($preguntas[1]));
+        $this->assertEquals("Ninguno de los anteriores.", $mult->textoNingunaDeLasAnteriores($preguntas[12]));   
+    }
+
+    public function testNingunaDeLasAnteriores(){
+        $mult = new MultipleChoice();
+        $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
+        $this->assertEquals("respuestas_incorrectas", $mult->ningunaDeLasAnteriores($preguntas[0]['respuestas_correctas']));
+        $this->assertEquals("respuestas_correctas", $mult->ningunaDeLasAnteriores($preguntas[1]['respuestas_correctas']));
+        $this->assertEquals("respuestas_incorrectas", $mult->ningunaDeLasAnteriores($preguntas[2]['respuestas_correctas']));
+    }
+
+    public function testInicializarArrayNoCorrectas(){
+        $mult = new MultipleChoice();
+        $this->assertEquals($mult->inicializarArrayNoCorrectas(5),['A','B','C','D','E']);
+        $this->assertEquals($mult->inicializarArrayNoCorrectas(3),['A','B','C']);
+    }
+
+    public function testRespuestaHTML(){
+        $mult = new MultipleChoice(12,2,FALSE);
+        $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
+        $pregunta['respuestas'] = array_merge($preguntas[0]['respuestas_correctas'],$preguntas[0]['respuestas_incorrectas']);
+        $this->assertEquals($mult->respuesta($pregunta,TRUE,0,0),'A');
+        $this->assertEquals($mult->respuesta($pregunta,FALSE,0,0),'');
+    }
+
+    public function testMostrarRespuestas(){
+        $mult = new MultipleChoice(12,2,FALSE);
+        $pregunta = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'][0];
+        $pregunta2['respuestas'] = array_merge($pregunta['respuestas_correctas'],$pregunta['respuestas_incorrectas']);
+        $pregunta['respuestas_correctas'][0] = "
+            <div class='option'>A)" . $pregunta['respuestas_correctas'][0] . "</div>";
+        $pregunta['respuestas_incorrectas'][0] = "
+            <div class='option'>B)" . $pregunta['respuestas_incorrectas'][0] . "</div>";
+        $pregunta['respuestas_incorrectas'][1] = "
+            <div class='option'>C)" . $pregunta['respuestas_incorrectas'][1] . "</div>";
+        $pregunta['respuestas_incorrectas'][2] = "
+            <div class='option'>D)" . $pregunta['respuestas_incorrectas'][2] . "</div>";
+        $aux = $pregunta['respuestas_correctas'][0] . $pregunta['respuestas_incorrectas'][0];
+        $aux = $aux . $pregunta['respuestas_incorrectas'][1] . $pregunta['respuestas_incorrectas'][2];
+
+        $this->assertEquals($aux, $mult->mostrarRespuestas($pregunta2));
+    }
+
+    public function testCabeceraHTMLyGenerarPrueba(){
+        $mult = new MultipleChoice();
+        $this->assertNotNull($mult->cabecera(0));
+        $this->assertNotNull($mult->generarPrueba(0, TRUE));
+    }
+    
+    public function testInicializarTespuestas(){
+        $mult = new MultipleChoice(12,2,FALSE);
+        $pregunta1 = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'][0];
+        $pregunta = $pregunta1;
+        array_push($pregunta1['respuestas_incorrectas'],"Ninguna de las anteriores");
+        $this->assertEquals($pregunta1, $mult->inicializarRespuestas($pregunta));
+    }
 }

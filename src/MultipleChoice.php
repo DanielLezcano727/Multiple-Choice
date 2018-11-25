@@ -29,6 +29,12 @@ class MultipleChoice {
     /**
      * Mezcla las preguntas y elige las que van a ser utilizadas para el examen
      *
+     * @param array $preguntas
+     *    Array con las preguntas que posee el archivo
+     * @param int $tema
+     *    Tema que se esta organizando
+     * 
+     * @return array
      */
     public function organizar($preguntas, $tema) {
 
@@ -45,46 +51,7 @@ class MultipleChoice {
         return $preguntas;
     }
 
-    public function generarPrueba($tema, $resolucion) {
-        $mostrar = $this->cabecera($tema);
-        $preguntaNro = 1;
-        foreach ($this->tema[$tema] as $preg) {
-            $mostrar .= "<div class='question'>
-            <div class='number'>" . $preguntaNro . ")__";
-            if ($resolucion) {
-                $contador = 0;
-                foreach ($preg['respuestas'] as $rta) {
-                    if ($rta == $this->temaCorrectoAux[$tema][$preguntaNro - 1]['respuestas_correctas'][0]) {
-                        break;
-                    }
-                    $contador++;
-                }
-                $mostrar .= chr($contador + ord('A')) . "__</div>";
-            }else {
-                $mostrar .= "____</div>";                
-            }
-            
-            $mostrar .= "\n<div class='description'>" . $this->devolverEnunciado($preg) . "</div>
-            <div class='options short'>";
-            $cantResp = 0;
-            foreach ($preg['respuestas'] as $rtas) {
-                $mostrar .= "
-                <div class='option'>" . chr($cantResp + ord('A')) . ")";
-                $mostrar .= $rtas . "</div>";
-                $cantResp++;
-            }
-            $mostrar .= "
-            </div>
-          </div>";
-            $preguntaNro++;
-        }
-        $mostrar .= "
-        </div>
-      </body>
-    </html>";
-        return $mostrar;
-    }
-
+    
     /**
      * Mezcla las preguntas y elimina las que sobren. Devuelve las preguntas restantes.
      *
@@ -134,17 +101,30 @@ class MultipleChoice {
                 unset($nuevaPregunta['respuestas'][$i]);
             }
         }
-        if (count($opcionesFinales) == 2 && ($opcionesFinales[0] == "Ninguna de las anteriores" || $opcionesFinales[0] == "Ninguno de los anteriores.")) {
-            $tmp = $opcionesFinales[0];
-            $opcionesFinales[0] = $opcionesFinales[1];
-            $opcionesFinales[1] = $tmp;
-        }
+        $opcionesFinales = $this->swapOpcionesFinales($opcionesFinales);
         $aux = $this->generarVariasCorrectas($nuevaPregunta, $pregunta);
         $nuevaPregunta = $aux[0];
         $pregunta = $aux[1];
         $this->temaCorrectoAux[$tema][$numero] = $aux[1];
         $nuevaPregunta['respuestas'] = array_merge($nuevaPregunta['respuestas'], $opcionesFinales);
         return $nuevaPregunta;
+    }
+
+    /**
+     * Intercambia la posicion de las opciones "Ninguna de las anteriores" y "Todas las anteriores" si es que la opcion Ninguna esta primera
+     * 
+     * @param array $opcionesFinales
+     *   Array que posee las dos opciones
+     * 
+     * @return array
+     */
+    public function swapOpcionesFinales($opcionesFinales){
+        if (count($opcionesFinales) == 2 && ($opcionesFinales[0] == "Ninguna de las anteriores" || $opcionesFinales[0] == "Ninguno de los anteriores.")) {
+            $tmp = $opcionesFinales[0];
+            $opcionesFinales[0] = $opcionesFinales[1];
+            $opcionesFinales[1] = $tmp;
+        }
+        return $opcionesFinales;
     }
 
     /**
@@ -190,6 +170,8 @@ class MultipleChoice {
     /**
      * Recuerda las respuestas correctas e incorrectas y devuelve la pregunta con las respuestas modificadas
      *
+     * @param array $pregunta
+     *    $pregunta que se quiere inicializar
      * @return array
      */
     public function inicializarRespuestas($pregunta) {
@@ -221,20 +203,10 @@ class MultipleChoice {
         if (array_key_exists('ocultas_opcion_ninguna_de_las_anteriores', $pregunta)) {
             $ningunaLasAnteriores = $pregunta['ocultas_opcion_ninguna_de_las_anteriores'];
         }
-        $cantCorrectas = count($pregunta['respuestas_correctas']);
         if (!$ningunaLasAnteriores) {
-            $tipo = "";
-            if ($cantCorrectas == 0) {
-                $tipo = 'respuestas_correctas';
-            }else {
-                $tipo = 'respuestas_incorrectas'; 
-            }
-
-            if (array_key_exists('texto_ninguna_de_las_anteriores', $pregunta)) {
-                $texto = $pregunta['texto_ninguna_de_las_anteriores'];
-            }else {
-                $texto = 'Ninguna de las anteriores';
-            }
+            
+            $tipo = $this->ningunaDeLasAnteriores($pregunta['respuestas_correctas']);
+            $texto = $this->textoNingunaDeLasAnteriores($pregunta);
 
             array_push($pregunta[$tipo], $texto);
         }
@@ -242,6 +214,49 @@ class MultipleChoice {
         return $pregunta;
     }
 
+    /**
+     * Si existe el indice "texto_ninguna_de_las_anteriores" devolvera ese texto, sino devolver "Ninguna de las anteriores"
+     * 
+     * @param array $pregunta
+     *    Pregunta que puede poseer la opcion texto_ninguna_de_las_anteriores
+     * 
+     * @return string
+     */
+    public function textoNingunaDeLasAnteriores($pregunta){
+        if (array_key_exists('texto_ninguna_de_las_anteriores', $pregunta)) {
+            return $pregunta['texto_ninguna_de_las_anteriores'];
+        }
+        return 'Ninguna de las anteriores';
+        
+    }
+
+    /**
+     * Devuelve el indice donde se debe guardar la respuesta "Ninguna de las anteriores"
+     * 
+     * @param array $pregunta
+     *    Array donde se va a guardar la opcion
+     * 
+     * @return string
+     */
+    public function ningunaDeLasAnteriores($pregunta){
+        $cantCorrectas = count($pregunta);
+        if ($cantCorrectas == 0) {
+            return 'respuestas_correctas';
+        }
+        return 'respuestas_incorrectas'; 
+    }
+
+    /**
+     * Si la pregunta tiene mas de una opcion correcta, genera una opcion que las posee a todas, opciones 
+     * en conjunto que son incorrectas y remueve las opciones correctas a las incorrectas, dejando como correcta la unica opcion que se genero
+     * 
+     * @param array $preguntaMezclada
+     *    Pregunta en la que se va a generar la respuesta en conjunto
+     * @param array $pregunta
+     *    Pregunta en la que se pueden identificar las respuestas correctas
+     * 
+     * @return array
+     */
     public function generarVariasCorrectas($preguntaMezclada, $pregunta) {
         $cantCorrectas = count($pregunta['respuestas_correctas']);
         
@@ -249,20 +264,8 @@ class MultipleChoice {
             return [$preguntaMezclada, $pregunta];
         }
         $preguntaMezclada['respuestas'] = array_values($preguntaMezclada['respuestas']);
-        $correctas = [];
-        $nocorrectas = [];
-        $cantRespuestas = count($preguntaMezclada['respuestas']);
-        for ($i = 0;$i < count($preguntaMezclada['respuestas']);$i++) {
-            array_push($nocorrectas, chr($i + ord('A')));
-        }
-        for ($i = 0;$i < $cantCorrectas;$i++) {
-            $correcta = $pregunta['respuestas_correctas'][$i];
-            for ($j = 0;$j < $cantRespuestas;$j++) {
-                if ($preguntaMezclada['respuestas'][$j] == $correcta) {
-                    array_push($correctas, chr($j + ord('A')));
-                }
-            }
-        }
+        $nocorrectas = $this->inicializarArrayNoCorrectas(count($preguntaMezclada['respuestas']));
+        $correctas = $this->inicializarArrayCorrectas($pregunta,$preguntaMezclada);
 
         $aux = $pregunta['respuestas_correctas'];
         unset($pregunta['respuestas_correctas']);
@@ -290,6 +293,136 @@ class MultipleChoice {
         return [$preguntaMezclada, $pregunta];
     }
 
+    /**
+     * Crea y devuelve un array de letras mayusculas empezando desde la A hasta la cantidad que se le indique
+     * 
+     * @param int $cant
+     *    Cantidad de letras a generar
+     * 
+     * @return array
+     */
+    public function inicializarArrayNoCorrectas($cant){
+        $aux = [];
+        for ($i = 0;$i < $cant;$i++) {
+            array_push($aux, chr($i + ord('A')));
+        }
+        return $aux;
+    }
+
+    /**
+     * Devuelve un array con las opciones que son las respuestas correctas
+     * 
+     * @param array $pregunta
+     *    Pregunta que posee la respuesta correcta
+     * @param array $preguntaMezclada
+     *    Pregunta de la que se quiere saber la posicion de la respuesta correcta
+     * 
+     * @return array
+     */
+    public function inicializarArrayCorrectas($pregunta,$preguntaMezclada){
+        $cantRespuestas = count($preguntaMezclada['respuestas']);
+        $cantCorrectas = count($pregunta['respuestas_correctas']);
+        $correctas = [];
+        for ($i = 0;$i < $cantCorrectas;$i++) {
+            $correcta = $pregunta['respuestas_correctas'][$i];
+            for ($j = 0;$j < $cantRespuestas;$j++) {
+                if ($preguntaMezclada['respuestas'][$j] == $correcta) {
+                    array_push($correctas, chr($j + ord('A')));
+                }
+            }
+        }
+        return $correctas;
+    }
+
+    /**
+     * Funcion encargada de generar la prueba en formato HTML
+     * 
+     * @param int $tema
+     *   Tema que se quiere generar
+     * @param bool $resolucion
+     *   Parametro que indica si se quiere visualizar la resolucion de la prueba
+     * 
+     * @return string
+     */
+    public function generarPrueba($tema, $resolucion) {
+        $mostrar = $this->cabecera($tema);
+        $preguntaNro = 1;
+        foreach ($this->tema[$tema] as $preg) {
+            $mostrar .= "<div class='question'>
+            <div class='number'>" . $preguntaNro . ")__";
+            $mostrar .= $this->respuesta($preg,$resolucion,$tema,$preguntaNro-1);
+            $mostrar .= "___</div>";
+            $mostrar .= "\n<div class='description'>" . $this->devolverEnunciado($preg) . "</div>
+            <div class='options short'>";
+            $mostrar .= $this->mostrarRespuestas($preg);
+            $mostrar .= "
+            </div>
+          </div>";
+            $preguntaNro++;
+        }
+        $mostrar .= "
+        </div>
+      </body>
+    </html>";
+        return $mostrar;
+    }
+
+    /**
+     * Devuelve si es pedido la resolucion de la pregunta
+     * 
+     * @param array $preg
+     *   Pregunta de la que se quiere saber la respuesta
+     * @param bool $resolucion
+     *   Booleano que determina si se quiere obtener la respuesta
+     * @param int $tema
+     *   Tema del cual se quiere obtener la respuesta
+     * @param int $preguntaNro
+     *   Numero de la pregunta de la cual se quiere obtener la respuesta
+     * 
+     * @return string
+     */
+    public function respuesta($preg,$resolucion,$tema,$preguntaNro){
+        if ($resolucion) {
+            $contador = 0;
+            foreach ($preg['respuestas'] as $rta) {
+                if ($rta == $this->temaCorrectoAux[$tema][$preguntaNro]['respuestas_correctas'][0]) {
+                    break;
+                }
+                $contador++;
+            }
+            return chr($contador + ord('A'));
+        }
+        return "";             
+    }
+
+    /**
+     * Devuelve las respuestas de una pregunta en formato html
+     * 
+     * @param array $preg
+     *    Pregunta de la que se quieren devolver las respuestas
+     * 
+     * @return string
+     */
+    public function mostrarRespuestas($preg){
+        $cantResp = 0;
+        $aux = "";
+        foreach ($preg['respuestas'] as $rtas) {
+            $aux .= "
+            <div class='option'>" . chr($cantResp + ord('A')) . ")";
+            $aux .= $rtas . "</div>";
+            $cantResp++;
+        }
+        return $aux;
+    }
+
+    /**
+     * Devuelve la cabecera del examen en formato html
+     * 
+     * @param int $tema
+     *    Tema del cual se quiere hacer la cabecera
+     * 
+     * @return string
+     */
     public function cabecera($tema) {
         $aux = '
         <!DOCTYPE html>
