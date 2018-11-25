@@ -190,16 +190,20 @@ class MultipleChoice {
         if (!$ningunaLasAnteriores) {
             
             $tipo = $this->ningunaDeLasAnteriores($pregunta['respuestas_correctas']);
-            if (array_key_exists('texto_ninguna_de_las_anteriores', $pregunta)) {
-                $texto = $pregunta['texto_ninguna_de_las_anteriores'];
-            }else {
-                $texto = 'Ninguna de las anteriores';
-            }
+            $texto = $this->textoNingunaDeLasAnteriores($pregunta);
 
             array_push($pregunta[$tipo], $texto);
         }
         
         return $pregunta;
+    }
+
+    public function textoNingunaDeLasAnteriores($pregunta){
+        if (array_key_exists('texto_ninguna_de_las_anteriores', $pregunta)) {
+            return $pregunta['texto_ninguna_de_las_anteriores'];
+        }
+        return 'Ninguna de las anteriores';
+        
     }
 
     public function ningunaDeLasAnteriores($pregunta){

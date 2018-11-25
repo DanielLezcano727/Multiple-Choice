@@ -122,5 +122,4 @@ class MultipleChoiceTest extends TestCase{
         }
     }
 
-    
 }
