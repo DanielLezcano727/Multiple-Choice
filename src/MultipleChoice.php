@@ -187,15 +187,9 @@ class MultipleChoice {
         if (array_key_exists('ocultas_opcion_ninguna_de_las_anteriores', $pregunta)) {
             $ningunaLasAnteriores = $pregunta['ocultas_opcion_ninguna_de_las_anteriores'];
         }
-        $cantCorrectas = count($pregunta['respuestas_correctas']);
         if (!$ningunaLasAnteriores) {
-            $tipo = "";
-            if ($cantCorrectas == 0) {
-                $tipo = 'respuestas_correctas';
-            }else {
-                $tipo = 'respuestas_incorrectas'; 
-            }
-
+            
+            $tipo = $this->ningunaDeLasAnteriores($pregunta['respuestas_correctas']);
             if (array_key_exists('texto_ninguna_de_las_anteriores', $pregunta)) {
                 $texto = $pregunta['texto_ninguna_de_las_anteriores'];
             }else {
@@ -206,6 +200,14 @@ class MultipleChoice {
         }
         
         return $pregunta;
+    }
+
+    public function ningunaDeLasAnteriores($pregunta){
+        $cantCorrectas = count($pregunta);
+        if ($cantCorrectas == 0) {
+            return 'respuestas_correctas';
+        }
+        return 'respuestas_incorrectas'; 
     }
 
     public function generarVariasCorrectas($preguntaMezclada, $pregunta) {
