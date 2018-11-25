@@ -274,6 +274,14 @@ class MultipleChoice {
         return [$preguntaMezclada, $pregunta];
     }
 
+    /**
+     * Crea y devuelve un array de letras mayusculas empezando desde la A hasta la cantidad que se le indique
+     * 
+     * @param int $cant
+     *    Cantidad de letras a generar
+     * 
+     * @return array
+     */
     public function inicializarArrayNoCorrectas($cant){
         $aux = [];
         for ($i = 0;$i < $cant;$i++) {

@@ -149,4 +149,10 @@ class MultipleChoiceTest extends TestCase{
         $this->assertEquals("respuestas_correctas", $mult->ningunaDeLasAnteriores($preguntas[1]['respuestas_correctas']));
         $this->assertEquals("respuestas_incorrectas", $mult->ningunaDeLasAnteriores($preguntas[2]['respuestas_correctas']));
     }
+
+    public function testInicializarArrayNoCorrectas(){
+        $mult = new MultipleChoice();
+        $this->assertEquals($mult->inicializarArrayNoCorrectas(5),['A','B','C','D','E']);
+        $this->assertEquals($mult->inicializarArrayNoCorrectas(3),['A','B','C']);
+    }
 }
