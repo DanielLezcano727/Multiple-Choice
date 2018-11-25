@@ -104,6 +104,14 @@ class MultipleChoice {
         return $nuevaPregunta;
     }
 
+    /**
+     * Intercambia la posicion de las opciones "Ninguna de las anteriores" y "Todas las anteriores" si es que la opcion Ninguna esta primera
+     * 
+     * @param array $opcionesFinales
+     *   Array que posee las dos opciones
+     * 
+     * @return array
+     */
     public function swapOpcionesFinales($opcionesFinales){
         if (count($opcionesFinales) == 2 && ($opcionesFinales[0] == "Ninguna de las anteriores" || $opcionesFinales[0] == "Ninguno de los anteriores.")) {
             $tmp = $opcionesFinales[0];

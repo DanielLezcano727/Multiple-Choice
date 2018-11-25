@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class MultipleChoiceTest extends TestCase{
 
-    public function testPrimero(){
+    public function testCrearMultipleChoice(){
         $MultChoice = new MultipleChoice();
         $this->assertTrue(isset($MultChoice));
     }
@@ -64,7 +64,7 @@ class MultipleChoiceTest extends TestCase{
         $preguntas = Yaml::parseFile('Preguntas/preguntas.yml')['preguntas'];
         $mult = new MultipleChoice(12,2,FALSE);
         for($i = 0; $i < 12;$i++){
-            $this->assertEquals($preguntas[$i], $mult->devolverPreguntas(0)[$i]);
+            $this->assertEquals($preguntas[$i]['descripcion'], $mult->devolverEnunciado($mult->devolverPreguntas(0)[$i]));
         }
     }
 
@@ -122,4 +122,15 @@ class MultipleChoiceTest extends TestCase{
         }
     }
 
+    public function testSwapOpcionesFinales(){
+        $mult = new MultipleChoice();
+        $opcionesFinales = ['Todas las anteriores','Ninguna de las anteriores'];
+        $opcionesFinalesaux = ['Ninguna de las anteriores','Todas las anteriores'];
+        $opcionesFinalesaux = $mult->swapOpcionesFinales($opcionesFinalesaux);
+        $this->assertEquals($opcionesFinales,$opcionesFinalesaux);
+        $opcionesFinales = ['Todas las anteriores','Ninguno de los anteriores.'];
+        $opcionesFinalesaux = ['Ninguno de los anteriores.','Todas las anteriores'];
+        $opcionesFinalesaux = $mult->swapOpcionesFinales($opcionesFinalesaux);
+        $this->assertEquals($opcionesFinales,$opcionesFinalesaux);
+    }
 }
