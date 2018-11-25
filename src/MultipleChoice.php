@@ -44,12 +44,14 @@ class MultipleChoice {
         return $preguntas;
     }
 
-    public function multipleChoice(){
+    public function multipleChoice($tema){
         $mostrar = "";
-        foreach($this->tema[0] as $preg){
+        foreach($this->tema[$tema] as $preg){
             $mostrar .= $this->devolverEnunciado($preg) . "\n";
+            $cantResp = 0;
             foreach($preg['respuestas'] as $rtas){
-                $mostrar .= "   " . $rtas . "\n";
+                $mostrar .= "   " . chr($cantResp + ord('A')). ")" . $rtas . "\n";
+                $cantResp++;
             }
             $mostrar .= "\n\n\n";
         }
@@ -109,6 +111,9 @@ class MultipleChoice {
             $opcionesFinales[0] = $opcionesFinales[1];
             $opcionesFinales[1] = $tmp;
         }
+        $aux = $this->generarVariasCorrectas($nuevaPregunta,$pregunta);
+        $nuevaPregunta = $aux[0];
+        $pregunta = $aux[1];
         $nuevaPregunta['respuestas'] = array_merge($nuevaPregunta['respuestas'],$opcionesFinales);
         return $nuevaPregunta;
     }
@@ -166,8 +171,20 @@ class MultipleChoice {
             $todasLasAnteriores = $pregunta['ocultar_opcion_todas_las_anteriores'];
         }
 
+        $cantIncorrectas = count($pregunta['respuestas_incorrectas']);
+
         if(!$todasLasAnteriores){
-            array_push($pregunta['respuestas_incorrectas'], 'Todas las anteriores');
+            $tipo = "";
+            if($cantIncorrectas == 0){
+                $tipo = 'respuestas_correctas';
+                $aux = $pregunta[$tipo];
+                unset($pregunta[$tipo]);
+                $pregunta['respuestas_incorrectas'] = $aux;
+                $pregunta[$tipo] = [];
+            }else{
+                $tipo = 'respuestas_incorrectas'; 
+            }
+            array_push($pregunta[$tipo], 'Todas las anteriores');
         }
 
         $ningunaLasAnteriores = FALSE;
@@ -175,10 +192,44 @@ class MultipleChoice {
         if(array_key_exists('ocultas_opcion_ninguna_de_las_anteriores',$pregunta)){
             $ningunaLasAnteriores = $pregunta['ocultas_opcion_ninguna_de_las_anteriores'];
         }
-
+        $cantCorrectas = count($pregunta['respuestas_correctas']);
         if(!$ningunaLasAnteriores){
+            $tipo = "";
+            if($cantIncorrectas == 0){
+                $tipo = 'respuestas_correctas';
+            }else{
+                $tipo = 'respuestas_incorrectas'; 
+            }
             array_push($pregunta['respuestas_incorrectas'], 'Ninguna de las anteriores');
         }
         return $pregunta;
+    }
+
+    public function generarVariasCorrectas($preguntaMezclada, $pregunta){
+        $cantCorrectas = count($pregunta['respuestas_correctas']);
+        
+        if($cantCorrectas<2){
+            return [$preguntaMezclada,$pregunta];
+        }
+        $preguntaMezclada['respuestas'] = array_values($preguntaMezclada['respuestas']);
+        $correctas = [];
+        $cantRespuestas = count($preguntaMezclada['respuestas']);
+        for($i=0;$i<$cantCorrectas;$i++){
+            $correcta = $pregunta['respuestas_correctas'][$i];
+            for($j=0;$j<$cantRespuestas;$j++){
+                if($preguntaMezclada['respuestas'][$j] == $correcta){
+                    array_push($correctas, chr($j + ord('A')));
+                }
+            }
+        }
+        sort($correctas);
+        $correctasOpc = $correctas[0];
+        for($i=1;$i<$cantCorrectas-1;$i++){
+            $correctasOpc .= ", " . $correctas[$i];
+        }
+        $correctasOpc .= " y " . $correctas[$cantCorrectas-1];
+        array_push($preguntaMezclada['respuestas'],$correctasOpc);
+        array_push($pregunta['respuestas_correctas'],$correctasOpc);
+        return [$preguntaMezclada,$pregunta];
     }
 }

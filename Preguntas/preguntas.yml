@@ -219,3 +219,11 @@ preguntas:
       - "Es un concepto de imágenes digitales, no aplica al audio."
       - "Afecta a ambas señales por igual."
     ocultar_opcion_todas_las_anteriores: true
+
+  - descripcion: ¿Cuáles de estos protocolos son utilizados para manejar recibir mails en internet?
+    respuestas_correctas:
+      - "IMAP"
+      - "POP3"
+    respuestas_incorrectas:
+      - "TCP/IP"
+      - "SMTP"

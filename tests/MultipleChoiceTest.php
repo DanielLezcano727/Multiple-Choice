@@ -45,9 +45,9 @@ class MultipleChoiceTest extends TestCase{
         $mult = new MultipleChoice(22);
         $this->assertEquals(22, $mult->devolverCantidad());
         $mult = new MultipleChoice(88);
-        $this->assertEquals(25, $mult->devolverCantidad());
+        $this->assertEquals(26, $mult->devolverCantidad());
         $mult = new MultipleChoice(-88);
-        $this->assertEquals(25, $mult->devolverCantidad());
+        $this->assertEquals(26, $mult->devolverCantidad());
     }
 
     public function testPreguntas(){
@@ -122,10 +122,4 @@ class MultipleChoiceTest extends TestCase{
         }
     }
     
-    public function testMostrar(){
-        $mult = new MultipleChoice(10,2);
-        // print_r($mult->multipleChoice());
-        print_r($mult->tema[0]);
-        print_r($mult->tema[1]);
-    }
 }
