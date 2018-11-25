@@ -122,4 +122,8 @@ class MultipleChoiceTest extends TestCase{
         }
     }
 
+    public function testRespuestasCorrectas(){
+        $mult = new MultipleChoice();
+        print_r($mult->generarPrueba(0,FALSE));
+    }
 }

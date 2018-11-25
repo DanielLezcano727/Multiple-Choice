@@ -45,46 +45,7 @@ class MultipleChoice {
         return $preguntas;
     }
 
-    public function generarPrueba($tema, $resolucion) {
-        $mostrar = $this->cabecera($tema);
-        $preguntaNro = 1;
-        foreach ($this->tema[$tema] as $preg) {
-            $mostrar .= "<div class='question'>
-            <div class='number'>" . $preguntaNro . ")__";
-            if ($resolucion) {
-                $contador = 0;
-                foreach ($preg['respuestas'] as $rta) {
-                    if ($rta == $this->temaCorrectoAux[$tema][$preguntaNro - 1]['respuestas_correctas'][0]) {
-                        break;
-                    }
-                    $contador++;
-                }
-                $mostrar .= chr($contador + ord('A')) . "__</div>";
-            }else {
-                $mostrar .= "____</div>";                
-            }
-            
-            $mostrar .= "\n<div class='description'>" . $this->devolverEnunciado($preg) . "</div>
-            <div class='options short'>";
-            $cantResp = 0;
-            foreach ($preg['respuestas'] as $rtas) {
-                $mostrar .= "
-                <div class='option'>" . chr($cantResp + ord('A')) . ")";
-                $mostrar .= $rtas . "</div>";
-                $cantResp++;
-            }
-            $mostrar .= "
-            </div>
-          </div>";
-            $preguntaNro++;
-        }
-        $mostrar .= "
-        </div>
-      </body>
-    </html>";
-        return $mostrar;
-    }
-
+    
     /**
      * Mezcla las preguntas y elimina las que sobren. Devuelve las preguntas restantes.
      *
@@ -134,17 +95,22 @@ class MultipleChoice {
                 unset($nuevaPregunta['respuestas'][$i]);
             }
         }
-        if (count($opcionesFinales) == 2 && ($opcionesFinales[0] == "Ninguna de las anteriores" || $opcionesFinales[0] == "Ninguno de los anteriores.")) {
-            $tmp = $opcionesFinales[0];
-            $opcionesFinales[0] = $opcionesFinales[1];
-            $opcionesFinales[1] = $tmp;
-        }
+        $opcionesFinales = $this->swapOpcionesFinales($opcionesFinales);
         $aux = $this->generarVariasCorrectas($nuevaPregunta, $pregunta);
         $nuevaPregunta = $aux[0];
         $pregunta = $aux[1];
         $this->temaCorrectoAux[$tema][$numero] = $aux[1];
         $nuevaPregunta['respuestas'] = array_merge($nuevaPregunta['respuestas'], $opcionesFinales);
         return $nuevaPregunta;
+    }
+
+    public function swapOpcionesFinales($opcionesFinales){
+        if (count($opcionesFinales) == 2 && ($opcionesFinales[0] == "Ninguna de las anteriores" || $opcionesFinales[0] == "Ninguno de los anteriores.")) {
+            $tmp = $opcionesFinales[0];
+            $opcionesFinales[0] = $opcionesFinales[1];
+            $opcionesFinales[1] = $tmp;
+        }
+        return $opcionesFinales;
     }
 
     /**
@@ -288,6 +254,55 @@ class MultipleChoice {
         array_push($preguntaMezclada['respuestas'], $correctasOpc);
         array_push($pregunta['respuestas_correctas'], $correctasOpc);
         return [$preguntaMezclada, $pregunta];
+    }
+
+    public function generarPrueba($tema, $resolucion) {
+        $mostrar = $this->cabecera($tema);
+        $preguntaNro = 1;
+        foreach ($this->tema[$tema] as $preg) {
+            $mostrar .= "<div class='question'>
+            <div class='number'>" . $preguntaNro . ")__";
+            $mostrar .= $this->respuesta($preg,$resolucion,$tema,$preguntaNro-1);
+            $mostrar .= "___</div>";
+            $mostrar .= "\n<div class='description'>" . $this->devolverEnunciado($preg) . "</div>
+            <div class='options short'>";
+            $mostrar .= $this->mostrarRespuestas($preg);
+            $mostrar .= "
+            </div>
+          </div>";
+            $preguntaNro++;
+        }
+        $mostrar .= "
+        </div>
+      </body>
+    </html>";
+        return $mostrar;
+    }
+
+    public function respuesta($preg,$resolucion,$tema,$preguntaNro){
+        if ($resolucion) {
+            $contador = 0;
+            foreach ($preg['respuestas'] as $rta) {
+                if ($rta == $this->temaCorrectoAux[$tema][$preguntaNro]['respuestas_correctas'][0]) {
+                    break;
+                }
+                $contador++;
+            }
+            return chr($contador + ord('A'));
+        }
+        return "";             
+    }
+
+    public function mostrarRespuestas($preg){
+        $cantResp = 0;
+        $aux = "";
+        foreach ($preg['respuestas'] as $rtas) {
+            $aux .= "
+            <div class='option'>" . chr($cantResp + ord('A')) . ")";
+            $aux .= $rtas . "</div>";
+            $cantResp++;
+        }
+        return $aux;
     }
 
     public function cabecera($tema) {
