@@ -29,6 +29,12 @@ class MultipleChoice {
     /**
      * Mezcla las preguntas y elige las que van a ser utilizadas para el examen
      *
+     * @param array $preguntas
+     *    Array con las preguntas que posee el archivo
+     * @param int $tema
+     *    Tema que se esta organizando
+     * 
+     * @return array
      */
     public function organizar($preguntas, $tema) {
 
