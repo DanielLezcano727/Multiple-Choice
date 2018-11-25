@@ -221,7 +221,6 @@ class MultipleChoice {
             return [$preguntaMezclada, $pregunta];
         }
         $preguntaMezclada['respuestas'] = array_values($preguntaMezclada['respuestas']);
-        $cantRespuestas = count($preguntaMezclada['respuestas']);
         $nocorrectas = $this->inicializarArrayNoCorrectas(count($preguntaMezclada['respuestas']));
         $correctas = $this->inicializarArrayCorrectas($pregunta,$preguntaMezclada);
 
